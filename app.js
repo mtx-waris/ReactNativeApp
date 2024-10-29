@@ -19,11 +19,54 @@ mongoose
     console.log(e);
   });
 require("./UserDetails");
+require("./Models/Customers ");
+
+const Customers = mongoose.model("Customers");
 const User = mongoose.model("UserInfo");
 
 app.get("/", (req, res) => {
   res.send({ status: "Started" });
 });
+
+app.post("/add-customers", async(req, res) => {
+
+  const { name, email, phoneNumber, createdDate,address } = req.body;
+
+  console.log("server request"+req.body);
+  try {
+    await Customers.create({
+      name: name,
+      email: email,
+      phoneNumber:phoneNumber,
+      createdDate: createdDate,
+      address:address
+    });
+    res.send({ status: "ok", data: "Customer Created!" });
+  } catch (error) {
+    res.send({ status: "error", data: error });
+  }
+
+});
+
+app.get('/get-all-customers', async (req, res) => {
+  try {
+    const data = await Customers.find({});
+    res.send({ status: "Ok", data: data });
+  } catch (error) {
+    return res.send({ error: error });
+  }
+});
+
+app.post("/delete-customer",async (req, res) => {
+  const {id}=req.body;
+  try {
+   await Customers.deleteOne({_id:id});
+   res.send({status:"Ok",data:"Customer Deleted"});
+  } catch (error) {
+   return res.send({ error: error });
+   
+  }
+ })
 
 app.post("/register", async (req, res) => {
   const { name, email, mobile, password, userType } = req.body;
